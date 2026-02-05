@@ -3,21 +3,6 @@ const { Client, Events, GatewayIntentBits } = require("discord.js");
 let msgCatVoice = ["Meow", "Nya", "Nyan", "Purr", "Myaoon", "Nyaan"];
 let playersRPS = [];
 let rpsON = false;
-const express = require("express");
-// Express Server Setup - For Testing if bot is running
-const PORT = process.env.PORT || 3000;
-const app = express();
-
-app.use(express.json());
-app.get("/", (req, res) => {
-  res.send("Discord-Bot(DES-1405) is currently running! and hasn't crashed!");
-});
-
-app.listen(PORT, () => {
-  console.log(
-    `Discord-Bot(DES-1405) app listening on port http://${process.env.HOST || "localhost"}:${PORT}`,
-  );
-});
 
 const client = new Client({
   intents: [
@@ -178,3 +163,20 @@ client.on(Events.InteractionCreate, async (interaction) => {
 });
 // Log in to Discord with your client's token
 client.login(process.env.TOKEN);
+
+const express = require("express");
+
+// Express Server Setup - For Testing if bot is running
+const PORT = process.env.PORT || 3000;
+const app = express();
+
+app.use(express.json());
+app.get("/", (req, res) => {
+  res.send("Discord-Bot(DES-1405) is currently running! and hasn't crashed!");
+});
+
+app.listen(PORT, () => {
+  console.log(
+    `Discord-Bot(DES-1405) app listening on port http://${process.env.HOST || "localhost"}:${PORT}`,
+  );
+});
