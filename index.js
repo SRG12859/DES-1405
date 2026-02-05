@@ -14,7 +14,7 @@ const client = new Client({
   ],
 });
 console.log("Starting to log in DES-1405 Bot...");
-client.login(process.env.TOKEN);
+client.login(process.env.DISCORD_TOKEN);
 client.once(Events.ClientReady, (readyClient) => {
   setBotReady(true); // Update the bot status to ready
   console.log(`Ready! Logged in as ${readyClient.user.tag}`);
