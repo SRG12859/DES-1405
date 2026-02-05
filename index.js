@@ -5,6 +5,13 @@ let playersRPS = [];
 let rpsON = false;
 const { setBotReady } = require("./web_server.js");
 
+// For BT1
+const referenceUTCBT1 = new Date();
+referenceUTCBT1.setUTCHours(19, 25, 0, 0);
+// For BT2
+const referenceUTCBT2 = new Date();
+referenceUTCBT2.setUTCHours(9, 55, 0, 0);
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -163,7 +170,46 @@ client.on(Events.InteractionCreate, async (interaction) => {
         );
       }
     }
+    if (interaction.commandName === "set-bt") {
+      interaction.reply(
+        `Bear Trap ${interaction.options.get("trap").value} has been set!`,
+      );
+      console.log(interaction.options.get("trap").value);
+      if (interaction.options.get("trap").value === 1) {
+        const firstDelayBT1 = referenceUTCBT1.getTime() - Date.now();
+        setTimeout(() => {
+          // Fire the first event at the reference time
+          triggerTrap(1, interaction);
+          // After that, keep repeating every 48 hours
+          setInterval(() => triggerTrap(1, interaction), 48 * 60 * 60 * 1000);
+        }, firstDelayBT1);
+      }
+      if (interaction.options.get("trap").value === 2) {
+        const firstDelayBT2 = referenceUTCBT2.getTime() - Date.now();
+        setTimeout(() => {
+          // Fire the first event at the reference time
+          triggerTrap(2, interaction);
+
+          // After that, keep repeating every 48 hours
+          setInterval(() => triggerTrap(2, interaction), 48 * 60 * 60 * 1000);
+        }, firstDelayBT2);
+      }
+    }
   } catch (error) {
     console.log(error);
   }
 });
+
+function triggerTrap(BTNumber, interaction) {
+  interaction.channel?.send(
+    `<@&${BTNumber === 1 ? process.env.BT1_ROLL_ID : process.env.BT2_ROLL_ID}> has been set! Bear Trap begins in 5 mins 🪤`,
+  );
+  setTimeout(
+    () => {
+      interaction.channel?.send(
+        `Bear Trap is active! Please Join Quickly! <@&${BTNumber === 1 ? process.env.BT1_ROLL_ID : process.env.BT2_ROLL_ID}> 🪤`,
+      );
+    },
+    5 * 60 * 1000,
+  ); // 5 minutes later
+}

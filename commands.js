@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import { REST, Routes } from "discord.js";
+import { ApplicationCommandOptionType, REST, Routes } from "discord.js";
 
 const commands = [
   {
@@ -24,9 +24,26 @@ const commands = [
     name: "del-rps",
     description: "Deletes the current Rock Paper Scissors game!",
   },
+  {
+    name: "set-bt",
+    description: "Sets Bear Trap",
+    required: true,
+    options: [
+      {
+        name: "trap",
+        description: "Choose which bear trap to set",
+        type: ApplicationCommandOptionType.Integer,
+        required: true,
+        choices: [
+          { name: "BT1", value: 1 },
+          { name: "BT2", value: 2 },
+        ],
+      },
+    ],
+  },
 ];
 
-const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
+const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
 
 try {
   console.log("Started refreshing application (/) commands.");

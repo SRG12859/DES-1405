@@ -8,7 +8,8 @@
   "private": true,
   "scripts": {
     "start": "node ./index.js",
-    "dev": "nodemon ./index.js"
+    "dev": "nodemon ./index.js",
+    "reload": "node ./commands.js"
   },
   "dependencies": {
     "discord.js": "^14.25.1",
