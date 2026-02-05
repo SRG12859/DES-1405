@@ -36,6 +36,7 @@ client.on(Events.MessageCreate, (message) => {
 });
 client.on(Events.InteractionCreate, async (interaction) => {
   let RPS_C = interaction.channelId === process.env.RPS_CHANNEL;
+  let BT_C = interaction.channelId === process.env.BT_CHANNEL;
   try {
     if (!interaction.isChatInputCommand()) return;
     if (interaction.commandName === "purr") {
@@ -171,28 +172,29 @@ client.on(Events.InteractionCreate, async (interaction) => {
       }
     }
     if (interaction.commandName === "set-bt") {
-      interaction.reply(
-        `Bear Trap ${interaction.options.get("trap").value} has been set!`,
-      );
-      console.log(interaction.options.get("trap").value);
-      if (interaction.options.get("trap").value === 1) {
-        const firstDelayBT1 = referenceUTCBT1.getTime() - Date.now();
-        setTimeout(() => {
-          // Fire the first event at the reference time
-          triggerTrap(1, interaction);
-          // After that, keep repeating every 48 hours
-          setInterval(() => triggerTrap(1, interaction), 48 * 60 * 60 * 1000);
-        }, firstDelayBT1);
-      }
-      if (interaction.options.get("trap").value === 2) {
-        const firstDelayBT2 = referenceUTCBT2.getTime() - Date.now();
-        setTimeout(() => {
-          // Fire the first event at the reference time
-          triggerTrap(2, interaction);
+      if (BT_C) {
+        interaction.reply(
+          `Bear Trap ${interaction.options.get("trap").value} has been set!`,
+        );
+        if (interaction.options.get("trap").value === 1) {
+          const firstDelayBT1 = referenceUTCBT1.getTime() - Date.now();
+          setTimeout(() => {
+            // Fire the first event at the reference time
+            triggerTrap(1, interaction);
+            // After that, keep repeating every 48 hours
+            setInterval(() => triggerTrap(1, interaction), 48 * 60 * 60 * 1000);
+          }, firstDelayBT1);
+        }
+        if (interaction.options.get("trap").value === 2) {
+          const firstDelayBT2 = referenceUTCBT2.getTime() - Date.now();
+          setTimeout(() => {
+            // Fire the first event at the reference time
+            triggerTrap(2, interaction);
 
-          // After that, keep repeating every 48 hours
-          setInterval(() => triggerTrap(2, interaction), 48 * 60 * 60 * 1000);
-        }, firstDelayBT2);
+            // After that, keep repeating every 48 hours
+            setInterval(() => triggerTrap(2, interaction), 48 * 60 * 60 * 1000);
+          }, firstDelayBT2);
+        }
       }
     }
   } catch (error) {
