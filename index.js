@@ -3,6 +3,18 @@ const { Client, Events, GatewayIntentBits } = require("discord.js");
 let msgCatVoice = ["Meow", "Nya", "Nyan", "Purr", "Myaoon", "Nyaan"];
 let playersRPS = [];
 let rpsON = false;
+const express = require("express");
+const app = express();
+const PORT = process.env.PORT || 3000;
+app.use(express.json());
+app.get("/", (req, res) => {
+  res.send("hello world");
+});
+app.listen(PORT, () => {
+  console.log(
+    `Discord bot(DES-1405) app listening on port localhost:${PORT} & ready for up-time tests`,
+  );
+});
 
 const client = new Client({
   intents: [
