@@ -5,6 +5,7 @@
   "main": "index.js",
   "author": "SGSSRG",
   "license": "MIT",
+  "private": true,
   "scripts": {
     "start": "node ./index.js",
     "dev": "nodemon ./index.js"
