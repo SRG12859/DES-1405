@@ -11,6 +11,7 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
   ],
 });
+client.login(process.env.TOKEN);
 client.once(Events.ClientReady, (readyClient) => {
   console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
@@ -161,8 +162,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
     console.log(error);
   }
 });
-// Log in to Discord with your client's token
-client.login(process.env.TOKEN);
 
 const express = require("express");
 
@@ -172,6 +171,8 @@ const app = express();
 
 app.use(express.json());
 app.get("/", (req, res) => {
+  // Log in to Discord with your client's token if it hasn't been logged in yet
+  if (!client.isReady()) client.login(process.env.TOKEN);
   res.send("Discord-Bot(DES-1405) is currently running! and hasn't crashed!");
 });
 
