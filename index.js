@@ -4,6 +4,7 @@ let msgCatVoice = ["Meow", "Nya", "Nyan", "Purr", "Myaoon", "Nyaan"];
 let playersRPS = [];
 let rpsON = false;
 const { setBotReady } = require("./web_server.js");
+console.log("Starting DES-1405 Bot...");
 
 const client = new Client({
   intents: [
@@ -12,10 +13,12 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
   ],
 });
+console.log("Starting to log in DES-1405 Bot...");
 client.login(process.env.TOKEN);
 client.once(Events.ClientReady, (readyClient) => {
   setBotReady(true); // Update the bot status to ready
   console.log(`Ready! Logged in as ${readyClient.user.tag}`);
+  console.info("Bot has logged on!");
 });
 client.on(Events.MessageCreate, (message) => {
   if (message.author.bot) return;
