@@ -5,7 +5,6 @@ let playersRPS = [];
 let rpsON = false;
 const { setBotReady } = require("./web_server.js");
 
-console.log("Starting DES-1405 Bot...");
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -13,22 +12,13 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
   ],
 });
-console.log(client.user?.tag);
-console.log("DISCORD_TOKEN length:", process.env.DISCORD_TOKEN?.length);
-console.log("RPS_CHANNEL:", process.env.RPS_CHANNEL);
-console.log(
-  "DISCORD_TOKEN starts with:",
-  process.env.DISCORD_TOKEN?.slice(0, 10),
-);
 
-console.log("Starting to log in DES-1405 Bot...");
 client.login(process.env.DISCORD_TOKEN).catch((err) => {
   console.error("Login failed:", err);
 });
 client.once(Events.ClientReady, (readyClient) => {
   setBotReady(true); // Update the bot status to ready
   console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-  console.info("Bot has logged on!");
 });
 client.on(Events.MessageCreate, (message) => {
   if (message.author.bot) return;
