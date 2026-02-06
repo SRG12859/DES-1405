@@ -12,6 +12,11 @@ referenceUTCBT1.setUTCHours(19, 25, 0, 0);
 const referenceUTCBT2 = new Date();
 referenceUTCBT2.setUTCHours(9, 55, 0, 0);
 
+// For Dice Game
+let diceVal;
+let playersJoinedDice = [];
+let diceGameState = false;
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -36,6 +41,8 @@ client.on(Events.MessageCreate, (message) => {
 });
 client.on(Events.InteractionCreate, async (interaction) => {
   let RPS_C = interaction.channelId === process.env.RPS_CHANNEL;
+  let BT_C = interaction.channelId === process.env.BT_CHANNEL;
+  let D_C = interaction.channelId === process.env.DICE_CHANNEL;
   try {
     if (!interaction.isChatInputCommand()) return;
     if (interaction.commandName === "purr") {
@@ -59,7 +66,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
         );
       }
     }
-
     if (interaction.commandName === "join-rps") {
       if (!RPS_C) {
         await interaction.reply("Command only works on RPS Channel! Sorry!");
@@ -171,29 +177,147 @@ client.on(Events.InteractionCreate, async (interaction) => {
       }
     }
     if (interaction.commandName === "set-bt") {
-      interaction.reply(
-        `Bear Trap ${interaction.options.get("trap").value} has been set!`,
-      );
-      console.log(interaction.options.get("trap").value);
-      if (interaction.options.get("trap").value === 1) {
-        const firstDelayBT1 = referenceUTCBT1.getTime() - Date.now();
-        setTimeout(() => {
-          // Fire the first event at the reference time
-          triggerTrap(1, interaction);
-          // After that, keep repeating every 48 hours
-          setInterval(() => triggerTrap(1, interaction), 48 * 60 * 60 * 1000);
-        }, firstDelayBT1);
-      }
-      if (interaction.options.get("trap").value === 2) {
-        const firstDelayBT2 = referenceUTCBT2.getTime() - Date.now();
-        setTimeout(() => {
-          // Fire the first event at the reference time
-          triggerTrap(2, interaction);
+      if (!BT_C)
+        await interaction.reply(
+          "Command only works on Bear Trap Channel! Sorry!",
+        );
+      if (BT_C) {
+        interaction.reply(
+          `Bear Trap ${interaction.options.get("trap").value} has been set!`,
+        );
+        if (interaction.options.get("trap").value === 1) {
+          const firstDelayBT1 = referenceUTCBT1.getTime() - Date.now();
+          setTimeout(() => {
+            // Fire the first event at the reference time
+            triggerTrap(1, interaction);
+            // After that, keep repeating every 48 hours
+            setInterval(() => triggerTrap(1, interaction), 48 * 60 * 60 * 1000);
+          }, firstDelayBT1);
+        }
+        if (interaction.options.get("trap").value === 2) {
+          const firstDelayBT2 = referenceUTCBT2.getTime() - Date.now();
+          setTimeout(() => {
+            // Fire the first event at the reference time
+            triggerTrap(2, interaction);
 
-          // After that, keep repeating every 48 hours
-          setInterval(() => triggerTrap(2, interaction), 48 * 60 * 60 * 1000);
-        }, firstDelayBT2);
+            // After that, keep repeating every 48 hours
+            setInterval(() => triggerTrap(2, interaction), 48 * 60 * 60 * 1000);
+          }, firstDelayBT2);
+        }
       }
+    }
+    if (interaction.commandName === "dice") {
+      if (!D_C) interaction.reply("Command only works on Dice Channel! Sorry!");
+      if (diceGameState)
+        interaction.reply(
+          "A Dice Game is already ongoing! Please join the current game or wait for it to finish!",
+        );
+      if (!diceGameState && D_C) {
+        diceGameState = true;
+        interaction.reply(
+          "A new Dice Game has started! Use /join-dice command to join!",
+        );
+      }
+    }
+    if (interaction.commandName === "join-dice") {
+      if (!D_C) interaction.reply("Command only works on Dice Channel! Sorry!");
+      if (!diceGameState)
+        interaction.reply(
+          "No Dice Game is currently ongoing! Please start a new game with /dice command!",
+        );
+      if (diceGameState && playersJoinedDice.includes(interaction.user.id)) {
+        interaction.reply(
+          "You are already in the Dice Game! DON'T U DARE AGAIN ANNOY ME!",
+        );
+      } else {
+        playersJoinedDice.push({
+          userId: interaction.user.id,
+          predictedNumber: interaction.options.get("number").value,
+        });
+        interaction.reply(
+          `You have joined the Dice Game! There are now ${playersJoinedDice.length} players.`,
+        );
+      }
+    }
+    if (interaction.commandName === "roll-dice") {
+      if (!D_C) interaction.reply("Command only works on Dice Channel! Sorry!");
+      if (!diceGameState)
+        interaction.reply(
+          "No Dice Game is currently ongoing! Please start a new game with /dice command!",
+        );
+      else {
+        diceVal = Math.floor(Math.random() * 6) + 1;
+        interaction.reply(`The dice rolled: ${diceVal}`);
+        interaction.channel?.send("The results are in! Calculating winners...");
+        let winners = [];
+        for (const prediction of playersJoinedDice) {
+          if (prediction.predictedNumber === diceVal) {
+            winners.push(prediction.userId);
+          }
+        }
+        if (winners.length > 0) {
+          interaction.channel?.send(
+            `The winners are: ${winners.map((id) => `<@${id}>`).join(", ")}`,
+          );
+        } else {
+          const closestUsers = playersJoinedDice.map((prediction) => ({
+            uid: prediction.userId,
+            diff: Math.abs(prediction.predictedNumber - diceVal),
+          }));
+
+          closestUsers.sort((a, b) => a.diff - b.diff);
+
+          // Guard clause: no predictions
+          if (closestUsers.length === 0) {
+            return interaction.channel?.send("No predictions were made!");
+          }
+
+          // Guard clause: only one prediction
+          if (closestUsers.length === 1) {
+            return interaction.channel?.send(
+              `Only one prediction was made. The closest guess was ${closestUsers[0].diff} away from the actual number! The closest user was <@${closestUsers[0].uid}>.`,
+            );
+          }
+
+          // Now safe to access [0] and [1]
+          if (closestUsers[0].diff === closestUsers[1].diff) {
+            const minDiff = closestUsers[0].diff;
+            const tiedUsers = closestUsers.filter(
+              (user) => user.diff === minDiff,
+            );
+
+            interaction.channel?.send(
+              `The closest guess was ${minDiff} away from the actual number!`,
+            );
+
+            const winner =
+              tiedUsers[Math.floor(Math.random() * tiedUsers.length)];
+            interaction.channel?.send(
+              `Hence, by randomness <@${winner.uid}> is the winner!`,
+            );
+          } else {
+            interaction.channel?.send(
+              `The closest guess was ${closestUsers[0].diff} away from the actual number! The closest user was <@${closestUsers[0].uid}>.`,
+            );
+            interaction.channel?.send(
+              `Hence, <@${closestUsers[0].uid}> is the winner!`,
+            );
+          }
+        }
+      }
+    }
+    if (interaction.commandName === "del-dice") {
+      if (!D_C) {
+        return interaction.reply("Command only works on Dice Channel! Sorry!");
+      }
+
+      diceGameState = false;
+      playersJoinedDice = [];
+      diceVal = null;
+
+      return interaction.reply(
+        "Dice Game has been reset! You can start a new one with /dice.",
+      );
     }
   } catch (error) {
     console.log(error);
