@@ -41,6 +41,38 @@ const commands = [
       },
     ],
   },
+  {
+    name: "dice",
+    description: "Predict the dice number nearest to the actual roll!",
+  },
+  {
+    name: "join-dice",
+    description: "Joins the Dice Prediction game!",
+    options: [
+      {
+        name: "number",
+        description: "Choose a number from 1 to 6",
+        type: ApplicationCommandOptionType.Integer,
+        required: true,
+        choices: [
+          { name: "1", value: 1 },
+          { name: "2", value: 2 },
+          { name: "3", value: 3 },
+          { name: "4", value: 4 },
+          { name: "5", value: 5 },
+          { name: "6", value: 6 },
+        ],
+      },
+    ],
+  },
+  {
+    name: "roll-dice",
+    description: "Rolls a dice from 1 to 6",
+  },
+  {
+    name: "del-dice",
+    description: "Deletes the current Dice Prediction game!",
+  },
 ];
 
 const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
