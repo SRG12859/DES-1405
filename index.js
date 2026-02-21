@@ -5,13 +5,6 @@ let playersRPS = [];
 let rpsON = false;
 const { setBotReady } = require("./web_server.js");
 
-// For BT1
-const referenceUTCBT1 = new Date();
-referenceUTCBT1.setUTCHours(19, 25, 0, 0);
-// For BT2
-const referenceUTCBT2 = new Date();
-referenceUTCBT2.setUTCHours(9, 55, 0, 0);
-
 // For Dice Game
 let diceVal;
 let playersJoinedDice = [];
@@ -51,6 +44,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       );
     }
     if (interaction.commandName === "rps") {
+      console.log("RPS Command Triggered!");
       if (!rpsON && RPS_C) {
         rpsON = true;
         await interaction.reply(
@@ -177,6 +171,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
       }
     }
     if (interaction.commandName === "set-bt") {
+      console.log("BT Trap Command Triggered!");
+      // For BT1
+      let referenceUTCBT1 = new Date();
+      referenceUTCBT1.setUTCHours(19, 30, 0, 0); // UTC 19:30
+      // For BT2
+      let referenceUTCBT2 = new Date();
+      referenceUTCBT2.setUTCHours(15, 0, 0, 0); // UTC 15
+
       if (!BT_C)
         await interaction.reply(
           "Command only works on Bear Trap Channel! Sorry!",
@@ -191,7 +193,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
             // Fire the first event at the reference time
             triggerTrap(1, interaction);
             // After that, keep repeating every 48 hours
-            setInterval(() => triggerTrap(1, interaction), 48 * 60 * 60 * 1000);
+            setInterval(() => triggerTrap(1, interaction), 48 * 60 * 60 * 1000); // DEBUG: 48 * 60 * 60 * 1000
           }, firstDelayBT1);
         }
         if (interaction.options.get("trap").value === 2) {
@@ -201,12 +203,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
             triggerTrap(2, interaction);
 
             // After that, keep repeating every 48 hours
-            setInterval(() => triggerTrap(2, interaction), 48 * 60 * 60 * 1000);
+            setInterval(() => triggerTrap(2, interaction), 48 * 60 * 60 * 1000); // DEBUG: 48 * 60 * 60 * 1000
           }, firstDelayBT2);
         }
       }
     }
     if (interaction.commandName === "dice") {
+      console.log("Dice game started");
       if (!D_C) interaction.reply("Command only works on Dice Channel! Sorry!");
       if (diceGameState)
         interaction.reply(
@@ -307,6 +310,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       }
     }
     if (interaction.commandName === "del-dice") {
+      console.log("Dice game deleted!");
       if (!D_C) {
         return interaction.reply("Command only works on Dice Channel! Sorry!");
       }
@@ -325,6 +329,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 });
 
 function triggerTrap(BTNumber, interaction) {
+  console.log(`Triggering BT${BTNumber} code block triggerTrap!`);
   interaction.channel?.send(
     `<@&${BTNumber === 1 ? process.env.BT1_ROLL_ID : process.env.BT2_ROLL_ID}> has been set! Bear Trap begins in 5 mins 🪤`,
   );
