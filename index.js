@@ -177,7 +177,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       referenceUTCBT1.setUTCHours(19, 25, 0, 0); // UTC 19:25
       // For BT2
       let referenceUTCBT2 = new Date();
-      referenceUTCBT2.setUTCHours(14, 55, 0, 0); // UTC 15
+      referenceUTCBT2.setUTCHours(14, 55, 0, 0); // UTC 14:55
 
       if (!BT_C)
         await interaction.reply(
