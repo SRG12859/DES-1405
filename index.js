@@ -174,10 +174,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
       console.log("BT Trap Command Triggered!");
       // For BT1
       let referenceUTCBT1 = new Date();
-      referenceUTCBT1.setUTCHours(19, 30, 0, 0); // UTC 19:30
+      referenceUTCBT1.setUTCHours(19, 25, 0, 0); // UTC 19:25
       // For BT2
       let referenceUTCBT2 = new Date();
-      referenceUTCBT2.setUTCHours(15, 0, 0, 0); // UTC 15
+      referenceUTCBT2.setUTCHours(14, 55, 0, 0); // UTC 15
 
       if (!BT_C)
         await interaction.reply(
