@@ -1,4 +1,6 @@
-require("dotenv").config();
+const envFile =
+  process.env.NODE_ENV === "production" ? ".env.prod" : ".env.dev";
+require("dotenv").config({ path: envFile });
 const { Client, Events, GatewayIntentBits } = require("discord.js");
 let msgCatVoice = ["Meow", "Nya", "Nyan", "Purr", "Myaoon", "Nyaan"];
 let playersRPS = [];
